@@ -209,7 +209,7 @@ if (error instanceof OAuthError && error.code === OAuthErrorCode.InvalidClient) 
 
 The variadic `.tool()`, `.prompt()`, `.resource()` methods are removed. Use the `register*` methods with a config object.
 
-**IMPORTANT**: v2 requires full Zod schemas — raw shapes like `{ name: z.string() }` are no longer supported. You must wrap with `z.object()`. This applies to `inputSchema`, `outputSchema`, and `argsSchema`.
+**IMPORTANT**: v2 requires schema objects implementing [Standard Schema](https://standardschema.dev/) — raw shapes like `{ name: z.string() }` are no longer supported. Wrap with `z.object()` (Zod v4), or use ArkType's `type({...})`, or Valibot. Applies to `inputSchema`, `outputSchema`, and `argsSchema`.
 
 ### Tools
 
@@ -279,7 +279,7 @@ Note: the third argument (`metadata`) is required — pass `{}` if no metadata.
 
 ### Schema Migration Quick Reference
 
-| v1 (raw shape) | v2 (Zod schema) |
+| v1 (raw shape) | v2 (Standard Schema object) |
 |----------------|-----------------|
 | `{ name: z.string() }` | `z.object({ name: z.string() })` |
 | `{ count: z.number().optional() }` | `z.object({ count: z.number().optional() })` |

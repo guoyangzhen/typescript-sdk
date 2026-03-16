@@ -220,9 +220,9 @@ server.registerResource('config', 'config://app', {}, async uri => {
 });
 ```
 
-### Zod schemas required (raw shapes no longer supported)
+### Standard Schema objects required (raw shapes no longer supported)
 
-v2 requires full Zod schemas for `inputSchema` and `argsSchema`. Raw object shapes are no longer accepted.
+v2 requires schema objects implementing the [Standard Schema spec](https://standardschema.dev/) for `inputSchema`, `outputSchema`, and `argsSchema`. Raw object shapes are no longer accepted. Zod v4, ArkType, and Valibot all implement the spec.
 
 **Before (v1):**
 
@@ -240,9 +240,15 @@ server.registerTool('greet', {
 ```typescript
 import * as z from 'zod/v4';
 
-// Must wrap with z.object()
+// Wrap with z.object() (or use any Standard Schema library)
 server.registerTool('greet', {
-  inputSchema: z.object({ name: z.string() })  // full Zod schema
+  inputSchema: z.object({ name: z.string() })
+}, async ({ name }) => { ... });
+
+// ArkType works too
+import { type } from 'arktype';
+server.registerTool('greet', {
+  inputSchema: type({ name: 'string' })
 }, async ({ name }) => { ... });
 
 // For tools with no parameters, use z.object({})
