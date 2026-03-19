@@ -476,6 +476,37 @@ describe('Standard Schema Support', () => {
             expect(result.completion.values).toEqual(['Alice', 'Bob', 'Charlie']);
             expect(result.completion.total).toBe(3);
         });
+
+        test('should support completion for optional completable fields', async () => {
+            mcpServer.registerPrompt(
+                'greeting',
+                {
+                    argsSchema: z.object({
+                        name: completable(z.string(), value =>
+                            ['Alice', 'Bob', 'Charlie'].filter(n => n.toLowerCase().startsWith(value.toLowerCase()))
+                        ).optional()
+                    })
+                },
+                async ({ name }) => ({
+                    messages: [{ role: 'user', content: { type: 'text', text: `Hello ${name ?? 'there'}` } }]
+                })
+            );
+
+            await connectClientAndServer();
+
+            const result = await client.request(
+                {
+                    method: 'completion/complete',
+                    params: {
+                        ref: { type: 'ref/prompt', name: 'greeting' },
+                        argument: { name: 'name', value: 'b' }
+                    }
+                },
+                CompleteResultSchema
+            );
+
+            expect(result.completion.values).toEqual(['Bob']);
+        });
     });
 
     describe('Error message quality', () => {

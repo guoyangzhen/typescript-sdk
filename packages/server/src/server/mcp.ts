@@ -385,7 +385,7 @@ export class McpServer {
         }
 
         const promptShape = getSchemaShape(prompt.argsSchema);
-        const field = promptShape?.[request.params.argument.name];
+        const field = unwrapOptionalSchema(promptShape?.[request.params.argument.name]);
         if (!isCompletable(field)) {
             return EMPTY_COMPLETION_RESULT;
         }
