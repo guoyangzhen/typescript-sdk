@@ -200,17 +200,17 @@ import * as z from 'zod/v4';
 const server = new McpServer({ name: 'demo', version: '1.0.0' });
 
 // Tool with schema
-server.registerTool('greet', { inputSchema: { name: z.string() } }, async ({ name }) => {
+server.registerTool('greet', { inputSchema: z.object({ name: z.string() }) }, async ({ name }) => {
     return { content: [{ type: 'text', text: `Hello, ${name}!` }] };
 });
 
 // Tool with description
-server.registerTool('greet', { description: 'Greet a user', inputSchema: { name: z.string() } }, async ({ name }) => {
+server.registerTool('greet', { description: 'Greet a user', inputSchema: z.object({ name: z.string() }) }, async ({ name }) => {
     return { content: [{ type: 'text', text: `Hello, ${name}!` }] };
 });
 
 // Prompt
-server.registerPrompt('summarize', { argsSchema: { text: z.string() } }, async ({ text }) => {
+server.registerPrompt('summarize', { argsSchema: z.object({ text: z.string() }) }, async ({ text }) => {
     return { messages: [{ role: 'user', content: { type: 'text', text: `Summarize: ${text}` } }] };
 });
 
