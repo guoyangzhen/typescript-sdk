@@ -6,7 +6,7 @@
 
 /* eslint-disable @typescript-eslint/no-namespace */
 
-// Standard Schema interfaces (from https://standardschema.dev)
+// Standard Schema interfaces — vendored from https://standardschema.dev (spec v1, Jan 2025)
 
 export interface StandardTypedV1<Input = unknown, Output = Input> {
     readonly '~standard': StandardTypedV1.Props<Input, Output>;
@@ -146,14 +146,19 @@ export function standardSchemaToJsonSchema(schema: StandardJSONSchemaV1, io: 'in
 
 export type StandardSchemaValidationResult<T> = { success: true; data: T } | { success: false; error: string };
 
+function formatIssue(issue: StandardSchemaV1.Issue): string {
+    if (!issue.path?.length) return issue.message;
+    const path = issue.path.map(p => String(typeof p === 'object' ? p.key : p)).join('.');
+    return `${path}: ${issue.message}`;
+}
+
 export async function validateStandardSchema<T extends StandardSchemaWithJSON>(
     schema: T,
     data: unknown
 ): Promise<StandardSchemaValidationResult<StandardSchemaWithJSON.InferOutput<T>>> {
     const result = await schema['~standard'].validate(data);
     if (result.issues && result.issues.length > 0) {
-        const errorMessage = result.issues.map((i: StandardSchemaV1.Issue) => i.message).join(', ');
-        return { success: false, error: errorMessage };
+        return { success: false, error: result.issues.map(i => formatIssue(i)).join(', ') };
     }
     return { success: true, data: (result as StandardSchemaV1.SuccessResult<unknown>).value as StandardSchemaWithJSON.InferOutput<T> };
 }
